@@ -1,8 +1,27 @@
+
 import requests
 
 import time
 
 import pymysql
+
+from sshtunnel import SSHTunnelForwarder
+
+
+
+server = SSHTunnelForwarder(
+
+        ssh_address_or_host=('182.92.11.239', 22), # 指定ssh登录的跳转机的address
+
+        ssh_username='root', # 跳转机的用户
+
+        ssh_password='451335a07472b09b', # 跳转机的密码
+
+        remote_bind_address=('127.0.0.1', 3306)
+
+        )
+
+server.start()
 
 conn = pymysql.connect(host='localhost',
 
