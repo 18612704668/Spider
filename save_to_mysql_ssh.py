@@ -1,5 +1,6 @@
 import requests
 import pymysql
+import time
 
 from sshtunnel import SSHTunnelForwarder
 
@@ -11,7 +12,7 @@ server = SSHTunnelForwarder(
 
         ssh_username='root', # 跳转机的用户
 
-        ssh_password='T5F744jdo7sdex', # 跳转机的密码
+        ssh_password='20yi123!@#$', # 跳转机的密码
 
         remote_bind_address=('127.0.0.1', 3306)
 
@@ -28,9 +29,9 @@ db = pymysql.connect(
         port=server.local_bind_port,
         user='root',
 
-        passwd='yMhXQYKr',
+        passwd='451335a07472b09b',
 
-        db='spider'
+        db='test'
 
 )
 
@@ -99,10 +100,20 @@ def main(index):
 
 if __name__ == "__main__":
     print("开始执行")
-    total_page_count = get_json(1)["result"]["query"]["totlePageCount"]  # 总页数
-    for index in range(1, total_page_count + 1):
-        main(index)
+    start = time.time()
+
+    totlePageCount = get_json(1)['result']["query"]["totlePageCount"]  # 获取总页数
+
     cur.close()
+
     db.commit()
+
     db.close()
-    print("执行结束")
+
+    print('采集总页数是：', totlePageCount)
+
+    print('执行结束')
+
+    end = time.time()
+
+    print(f'程序执行时间是{end - start}秒。')

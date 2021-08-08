@@ -15,7 +15,7 @@ server = SSHTunnelForwarder(
 
         ssh_username='root', # 跳转机的用户
 
-        ssh_password='451335a07472b09b', # 跳转机的密码
+        ssh_password='20yi123!@#$', # 跳转机的密码
 
         remote_bind_address=('127.0.0.1', 3306)
 
@@ -29,7 +29,7 @@ conn = pymysql.connect(host='localhost',
 
                        user='root',
 
-                       passwd='root',
+                       passwd='451335a07472b09b',
 
                        db='test',
 
