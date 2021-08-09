@@ -4,19 +4,42 @@ import time
 
 import pymysql
 
-conn = pymysql.connect(host='localhost',
+from sshtunnel import SSHTunnelForwarder
 
-                       port=3306,
+print('开始执行')
+start = time.time()
 
-                       user='root',
+server = SSHTunnelForwarder(
 
-                       passwd='',
+        ssh_address_or_host=('182.92.11.239', 22), # 指定ssh登录的跳转机的address
 
-                       db='test',
+        ssh_username='root', # 跳转机的用户
 
-                       charset='utf8')  # 连接数据库
+        ssh_password='20yi123!@#$', # 跳转机的密码
 
-cur = conn.cursor()
+        remote_bind_address=('127.0.0.1', 3306)
+
+        )
+
+server.start()
+
+
+
+db = pymysql.connect(
+
+        host='127.0.0.1',
+
+        port=server.local_bind_port,
+        user='root',
+
+        passwd='451335a07472b09b',
+
+        db='test'
+
+)
+
+cur = db.cursor()
+
 
 
 
@@ -40,7 +63,7 @@ payload = {
 
     "orderType": 5,
 
-    "pageIndex": 1,
+    "pageIndex": -1,
 
     "pageSize": 50,
 
@@ -74,15 +97,51 @@ response = requests.post(url, json=payload, headers=headers)
 
 content_json = response.json()
 
+
+# 获得请求数据
+
 #print(content_json)
 #print(content_json["result"])
 #print(content_json["result"]["list"])
-d = content_json["result"]["list"]
+#d = content_json["result"]["list"]
 #print(type(d))
-print(len(d))
-e = d[0]
-print(type(d[0]))
-print(len(e))
-
+#print(len(d))
+#e = d[0]
+#print(type(d[0]))
+#print(len(e))
+#print(content_json)
+print(type(content_json))
+print(content_json["code"])
+#print(content_json["result"]["list"])
+print(type(content_json["result"]["list"]))
+#print(content_json["list"])
 #for k,v in e.items():
 #    print(k,v)
+course_data = []
+
+for item in content_json["result"]["list"]:
+    course_value = (item['courseId'], item['productId'], item['productType'],
+
+                    item['productName'], item['provider'], item['score'],
+
+                    item['scoreLevel'], item['learnerCount'],
+
+                    item['lessonCount'], item['lectorName'],
+
+                    item['originalPrice'], item['discountPrice'],
+
+                    item['discountRate'], item['imgUrl'], item['bigImgUrl'],
+
+                    item['description'],)
+
+    course_data.append(course_value)
+string_s = ('%s,' * 16)[:-1]
+sql_course = f"insert into course2 values ({string_s})"
+cur.executemany(sql_course, course_data)
+db.commit()
+
+db.close()
+
+end = time.time()
+print('执行结束')
+print(f'程序执行时间是{end - start}秒。')

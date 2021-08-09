@@ -4,19 +4,41 @@ import time
 
 import pymysql
 
-conn = pymysql.connect(host='localhost',
+from sshtunnel import SSHTunnelForwarder
 
-                       port=3306,
 
-                       user='root',
 
-                       passwd='root',
+server = SSHTunnelForwarder(
 
-                       db='test',
+        ssh_address_or_host=('182.92.11.239', 22), # 指定ssh登录的跳转机的address
 
-                       charset='utf8')  # 连接数据库
+        ssh_username='root', # 跳转机的用户
 
-cur = conn.cursor()
+        ssh_password='20yi123!@#$', # 跳转机的密码
+
+        remote_bind_address=('127.0.0.1', 3306)
+
+        )
+
+server.start()
+
+
+
+db = pymysql.connect(
+
+        host='127.0.0.1',
+
+        port=server.local_bind_port,
+        user='root',
+
+        passwd='451335a07472b09b',
+
+        db='test'
+
+)
+
+cur = db.cursor()
+
 
 
 def get_json(index):
@@ -73,19 +95,15 @@ def get_json(index):
         response = requests.post(url, json=payload, headers=headers)
 
         content_json = response.json()
-
         if content_json and content_json["code"] == 0:
             return content_json
-
-        return None
-
+        return none
     except Exception as e:
-
-        print('出错了')
-
+        print('出错了！')
         print(e)
-
         return None
+
+
 def get_content(content_json):
 
     """
@@ -102,7 +120,7 @@ def get_content(content_json):
 
         return content_json["result"]["list"]
 
-''''''
+'''
 
 def check_course_exit(course_id):
     """
@@ -128,7 +146,7 @@ def check_course_exit(course_id):
     else:
 
         return False
-''''''
+'''
 
 def save_to_course(course_data):
     string_s = ('%s,' * 16)[:-1]
@@ -161,6 +179,7 @@ def save_mysql(content):
     save_to_course(course_data)
 
 
+
 def main(index):
     content_json = get_json(index)
 
@@ -174,13 +193,16 @@ if __name__ == '__main__':
 
     start = time.time()
 
+
     totlePageCount = get_json(1)['result']["query"]["totlePageCount"]  # 获取总页数
 
     cur.close()
 
-    conn.commit()
 
-    conn.close()
+
+    db.commit()
+
+    db.close()
 
     print('采集总页数是：',totlePageCount)
 
